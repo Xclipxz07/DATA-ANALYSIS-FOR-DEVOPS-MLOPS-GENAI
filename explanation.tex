@@ -1,0 +1,614 @@
+\documentclass{article}
+
+\title{Sales Forecasting System \\ Complete Technical Guide}
+\author{DevOps, MLOps, GenAI Integration}
+\date{January 2026}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This project demonstrates a complete modern data science and DevOps architecture combining multiple technologies:
+
+\begin{itemize}
+\item Database management with SQLite
+\item Interactive analysis with Jupyter Notebook
+\item Machine learning predictions
+\item Generative AI integration
+\item Data visualization
+\item REST API development
+\item Container orchestration
+\item Continuous integration and deployment
+\end{itemize}
+
+\section{Part 1: SQLite Database}
+
+\subsection{Purpose}
+
+The SQLite database stores all historical sales data. It serves as the single source of truth for our forecasting system.
+
+\subsection{Schema}
+
+The sales table contains these columns:
+
+\begin{itemize}
+\item id - Primary key, auto-incremented record identifier
+\item product - Product name (Widget A, Widget B, etc.)
+\item region - Geographic region (North, South, East, West)
+\item date - Transaction date in YYYY-MM-DD format
+\item units\_sold - Integer number of units sold
+\item revenue - Decimal revenue amount
+\end{itemize}
+
+\subsection{Sample Data}
+
+Example records from the sales table:
+
+\begin{verbatim}
+id | product  | region | date       | units_sold | revenue
+1  | Widget A | North  | 2025-01-01 | 10         | 100.00
+2  | Widget B | South  | 2025-01-01 | 5          | 50.00
+3  | Widget A | North  | 2025-01-02 | 12         | 120.00
+\end{verbatim}
+
+\subsection{Creation}
+
+Create the database using sales.sql:
+
+\begin{verbatim}
+sqlite3 sales.db < sales.sql
+\end{verbatim}
+
+\section{Part 2: Jupyter Notebook Analysis}
+
+\subsection{Overview}
+
+The Jupyter notebook contains 10 interconnected cells that form the analysis pipeline.
+
+\subsection{Cell Structure}
+
+Cell 1: Data Loading and Export
+
+Connects to SQLite, loads all sales data, exports to CSV for backup, filters by region.
+
+Cell 2-3: Package Installation
+
+Installs Plotly, Dash, and other required libraries for visualization and web framework.
+
+Cell 4: OpenAI API Integration
+
+Calls OpenAI's ChatGPT model with historical sales data to generate AI predictions.
+
+Cell 5: Response Parsing
+
+Extracts numerical predictions from AI text response using regex parsing.
+
+Cell 6: Actual Sales Visualization
+
+Creates interactive Plotly line chart showing historical sales trends.
+
+Cell 7: Predicted Sales Visualization
+
+Creates interactive Plotly chart showing forecast predictions.
+
+Cell 8: FastAPI Endpoint Definition
+
+Defines REST API endpoints for /sales and /predict routes.
+
+Cell 9: API Testing
+
+Tests endpoints and validates responses with error handling.
+
+Cell 10: Server Launch
+
+Starts the FastAPI server with uvicorn for local testing.
+
+\subsection{Key Libraries}
+
+pandas - Data manipulation and analysis
+
+sqlite3 - Database connectivity
+
+plotly - Interactive visualizations
+
+scikit-learn - Machine learning algorithms
+
+openai - OpenAI API client
+
+fastapi - Modern web framework
+
+uvicorn - ASGI server
+
+\section{Part 3: Machine Learning Model}
+
+\subsection{Algorithm}
+
+LinearRegression from scikit-learn provides baseline forecasting by learning linear trends.
+
+\subsection{How It Works}
+
+The model fits a line through historical data points and extrapolates to future dates.
+
+Example: If sales increased by 2 units per day, the model predicts this trend continues.
+
+\subsection{Implementation}
+
+\begin{verbatim}
+from sklearn.linear_model import LinearRegression
+import pandas as pd
+
+# Convert dates to ordinal numbers
+X = data['date_ordinal'].values.reshape(-1, 1)
+y = data['units_sold'].values
+
+# Train model
+model = LinearRegression()
+model.fit(X, y)
+
+# Predict next 7 days
+future_dates = [[date1], [date2], ..., [date7]]
+predictions = model.predict(future_dates)
+\end{verbatim}
+
+\subsection{Strengths}
+
+Simple and interpretable
+
+Fast training and prediction
+
+Low computational overhead
+
+Works with limited data
+
+\subsection{Limitations}
+
+Cannot capture complex nonlinear patterns
+
+Assumes constant trend
+
+Sensitive to outliers
+
+No seasonal adjustment
+
+\section{Part 4: Generative AI Integration}
+
+\subsection{OpenAI API}
+
+Uses ChatGPT (gpt-4o-mini model) for intelligent sales analysis.
+
+\subsection{Process}
+
+1. Format historical sales data as text
+2. Send prompt to OpenAI API
+3. Receive AI-generated forecast
+4. Parse numbers from response
+5. Use as additional prediction source
+
+\subsection{Implementation}
+
+\begin{verbatim}
+from openai import OpenAI
+
+client = OpenAI(api_key='YOUR_KEY')
+
+history = data.to_dict('records')
+prompt = f'Predict sales: {history}'
+
+response = client.chat.completions.create(
+    model='gpt-4o-mini',
+    messages=[{'role': 'user', 'content': prompt}]
+)
+
+prediction = response.choices[0].message.content
+\end{verbatim}
+
+\subsection{Response Parsing}
+
+Uses regex to extract numbers from AI text response:
+
+\begin{verbatim}
+import re
+numbers = re.findall(r'\b\d+\b', prediction)
+forecast = [int(n) for n in numbers[:7]]
+\end{verbatim}
+
+\subsection{API Considerations}
+
+Requires valid API key from platform.openai.com
+
+Incurs cost per API call
+
+gpt-4o-mini offers good balance of speed and accuracy
+
+\section{Part 5: Data Visualization}
+
+\subsection{Plotly Dashboard}
+
+Interactive charts for exploring sales data and predictions.
+
+\subsection{Chart Types}
+
+Line charts for time-series trends
+
+Scatter plots with markers for predictions
+
+Interactive legends and hover tooltips
+
+Responsive sizing for different displays
+
+\subsection{Components}
+
+\begin{verbatim}
+import plotly.graph_objects as go
+
+# Actual sales chart
+fig1 = go.Figure()
+fig1.add_trace(go.Scatter(
+    x=data['date'],
+    y=data['units_sold'],
+    mode='lines',
+    name='Actual Sales'
+))
+
+# Predicted sales chart
+fig2 = go.Figure()
+fig2.add_trace(go.Scatter(
+    x=future_dates,
+    y=predictions,
+    mode='lines+markers',
+    name='Forecast'
+))
+\end{verbatim}
+
+\subsection{Features}
+
+Hover information shows exact values
+
+Click legend items to toggle visibility
+
+Download charts as PNG
+
+Zoom and pan capabilities
+
+\section{Part 6: FastAPI REST API}
+
+\subsection{Overview}
+
+Exposes predictions via HTTP endpoints for external applications.
+
+\subsection{Endpoints}
+
+GET /sales - Returns all sales records as JSON
+
+GET /predict - Returns forecast for specified region
+
+GET /docs - Interactive API documentation (Swagger UI)
+
+\subsection{Implementation}
+
+\begin{verbatim}
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get('/sales')
+def get_sales():
+    return data.to_dict('records')
+
+@app.get('/predict')
+def predict(region: str = 'North'):
+    return {'region': region, 'forecast': predictions}
+\end{verbatim}
+
+\subsection{Running}
+
+\begin{verbatim}
+uvicorn api:app --host 0.0.0.0 --port 8000
+\end{verbatim}
+
+Access at http://localhost:8000/docs
+
+\subsection{Usage}
+
+\begin{verbatim}
+curl http://localhost:8000/sales
+curl http://localhost:8000/predict?region=North
+\end{verbatim}
+
+\section{Part 7: Docker Containerization}
+
+\subsection{Purpose}
+
+Packages application with all dependencies in isolated container.
+
+\subsection{Dockerfile}
+
+\begin{verbatim}
+FROM python:3.11
+WORKDIR /app
+COPY . .
+RUN pip install -r requirements.txt
+CMD ["python", "app.py"]
+\end{verbatim}
+
+\subsection{Building}
+
+\begin{verbatim}
+docker build -t sales-app:latest .
+\end{verbatim}
+
+\subsection{Running}
+
+\begin{verbatim}
+docker run -d -p 8000:8000 sales-app:latest
+docker logs <container-id>
+docker stop <container-id>
+\end{verbatim}
+
+\subsection{Benefits}
+
+Consistent environment across machines
+
+Simplified deployment process
+
+Easy version management
+
+Isolation from host system
+
+\section{Part 8: Kubernetes Orchestration}
+
+\subsection{Overview}
+
+Manages containerized applications at scale across multiple servers.
+
+\subsection{Deployment Configuration}
+
+\begin{verbatim}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sales-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sales-app
+  template:
+    metadata:
+      labels:
+        app: sales-app
+    spec:
+      containers:
+      - name: sales-app
+        image: sales-app:latest
+        ports:
+        - containerPort: 8000
+\end{verbatim}
+
+\subsection{Service Configuration}
+
+\begin{verbatim}
+apiVersion: v1
+kind: Service
+metadata:
+  name: sales-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: sales-app
+  ports:
+  - port: 80
+    targetPort: 8000
+\end{verbatim}
+
+\subsection{Deployment Commands}
+
+\begin{verbatim}
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+kubectl get pods
+kubectl get services
+kubectl logs <pod-name>
+\end{verbatim}
+
+\subsection{Features}
+
+Automatic pod restart on failure
+
+Load balancing across replicas
+
+Rolling updates with zero downtime
+
+Horizontal scaling
+
+\section{Part 9: Jenkins CI/CD Pipeline}
+
+\subsection{Purpose}
+
+Automates testing, building, and deployment when code changes.
+
+\subsection{Jenkinsfile}
+
+\begin{verbatim}
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git url: 'https://github.com/user/repo.git'
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                sh 'docker build -t sales-app .'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'python -m pytest tests/'
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                sh 'kubectl apply -f deployment.yaml'
+            }
+        }
+    }
+}
+\end{verbatim}
+
+\subsection{Pipeline Stages}
+
+Checkout - Pull code from GitHub
+
+Build - Create Docker image
+
+Test - Run unit tests
+
+Deploy - Update Kubernetes deployment
+
+\subsection{Triggering}
+
+Webhook from GitHub on push
+
+Scheduled builds at specific times
+
+Manual trigger via Jenkins UI
+
+\subsection{Benefits}
+
+Automated testing catches errors early
+
+Consistent build process
+
+Fast deployment cycles
+
+Complete deployment history
+
+\section{System Architecture}
+
+\subsection{Data Flow}
+
+SQLite Database stores historical sales data
+
+Jupyter loads data and generates analysis
+
+ML model learns patterns from historical data
+
+OpenAI API provides intelligent predictions
+
+Plotly creates interactive visualizations
+
+FastAPI serves predictions via HTTP
+
+Docker containers package the application
+
+Kubernetes orchestrates container deployment
+
+Jenkins automates the entire pipeline
+
+\subsection{Integration Points}
+
+Database provides input data
+
+ML and AI produce predictions
+
+Visualization and API consume predictions
+
+Containers enable portability
+
+Kubernetes provides scalability
+
+Jenkins automates deployment
+
+\section{Getting Started}
+
+\subsection{Prerequisites}
+
+Python 3.9 or higher
+
+pip package manager
+
+Docker installed
+
+kubectl configured for Kubernetes cluster
+
+Jenkins server running
+
+\subsection{Installation Steps}
+
+1. Clone repository from GitHub
+
+2. Install Python dependencies:
+\begin{verbatim}
+pip install -r requirements.txt
+\end{verbatim}
+
+3. Create SQLite database:
+\begin{verbatim}
+sqlite3 sales.db < sales.sql
+\end{verbatim}
+
+4. Set OpenAI API key:
+\begin{verbatim}
+export OPENAI_API_KEY='your-key-here'
+\end{verbatim}
+
+5. Launch Jupyter notebook:
+\begin{verbatim}
+jupyter notebook sales.ipynb
+\end{verbatim}
+
+6. Execute cells in order from Cell 1 to Cell 10
+
+7. Access API documentation at http://localhost:8000/docs
+
+\section{Troubleshooting}
+
+\subsection{Common Issues}
+
+Database connection failed - Ensure sales.db exists and has correct permissions
+
+API key invalid - Verify OpenAI key is correct and has remaining credits
+
+Port already in use - Kill existing process or use different port
+
+Docker build fails - Check Docker daemon is running and Dockerfile is valid
+
+Kubernetes pod crashes - Check logs with kubectl logs command
+
+\subsection{Debugging}
+
+View database contents: sqlite3 sales.db
+
+Check API logs: docker logs container-name
+
+Inspect pod status: kubectl describe pod pod-name
+
+Monitor resource usage: kubectl top nodes
+
+\section{Summary}
+
+This integrated system demonstrates:
+
+- Data persistence with SQLite
+- Interactive analysis with Jupyter
+- Machine learning predictions
+- Generative AI integration
+- Data visualization with Plotly
+- Web API with FastAPI
+- Container management with Docker
+- Orchestration with Kubernetes
+- Automation with Jenkins
+
+All components work together to create a production-ready forecasting platform capable of analyzing historical data, generating predictions, and serving results via scalable cloud infrastructure.
+
+\end{document}

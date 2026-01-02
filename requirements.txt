@@ -1,0 +1,9 @@
+pandas
+dash
+plotly
+scikit-learn
+openai
+sqlite3
+fastapi
+uvicorn
+pyspark
