@@ -358,7 +358,7 @@ DevOps, MLOps, GenAI Project Team
 ## 📞 Support
 
 - GitHub Issues: Report bugs and request features
-- Email: your-email@example.com
+- Email: PRABHATDHAR32@GMAIL.COM
 - Documentation: See explanation.tex
 
 ## 🎓 Learning Resources
@@ -384,3 +384,4 @@ DevOps, MLOps, GenAI Project Team
 **Last Updated**: January 2, 2026
 
 **Status**: Production Ready ✅
+
