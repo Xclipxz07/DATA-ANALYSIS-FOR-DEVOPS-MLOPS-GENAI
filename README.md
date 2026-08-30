@@ -50,7 +50,7 @@ This project demonstrates an integrated data science and engineering stack:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/sales-forecasting.git
+   git clone https://github.com/Xclipxz07/DATA-ANALYSIS-FOR-DEVOPS-MLOPS-GENAI.git
    cd sales-forecasting
    ```
 
